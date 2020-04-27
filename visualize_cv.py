@@ -1,5 +1,5 @@
 
-import cv2
+import cv2 as cv2
 import numpy as np
 
 
@@ -22,9 +22,8 @@ def apply_mask(image, mask, color, alpha=0.5):
 def display_instances(image, boxes, masks, ids, names, scores):
     
     n_instances = boxes.shape[0]
-    if not n_instances:
-        print('NO INSTANCES TO DISPLAY')
-    else:
+        
+    if n_instances:
         assert boxes.shape[0] == masks.shape[-1] == ids.shape[0]
     
     colors = random_colors(n_instances)
@@ -87,23 +86,37 @@ if __name__ == '__main__':
     #capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     
     while True:
+        startTime = time.time()
         ret, frame = capture.read()
+        captureTime = time.time()
         results = model.detect([frame], verbose=0)
+        modelTime = time.time()
         r = results[0]
         
         frame = display_instances(
             frame, r['rois'], r['masks'], r['class_ids'], class_names, r['scores']
         )
-        
+        renderTime = time.time()
         
         cv2.imshow('frame', frame)
-        
+        showTime = time.time()
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         
     
-    caption.release()
-    cv2.destoryAllWindows()
+    #caption.release()
+    #cv2.destoryWindow('frame')
+    
+    print("Start Time: "+ str(startTime))
+    timeTocap = captureTime - startTime
+    print("Time it took to capture the frame: " + str(timeTocap))
+    timeTomod = modelTime - captureTime
+    print("Time it took for the model to run: " + str(timeTomod))
+    timeToren = renderTime - modelTime
+    print("Time it took for the image to render: " + str(timeToren))
+    timeToshow = showTime - renderTime
+    print("Time it took for the image to render: " + str(timeToshow))
+    
         
         
         
