@@ -2446,6 +2446,7 @@ class MaskRCNN():
         boxes = detections[:N, :4]
         class_ids = detections[:N, 4].astype(np.int32)
         scores = detections[:N, 5]
+        
         masks = mrcnn_mask[np.arange(N), :, :, class_ids]
 
         # Translate normalized coordinates in the resized image to pixel
@@ -2583,7 +2584,9 @@ class MaskRCNN():
         # Run object detection
         detections, _, _, mrcnn_mask, _, _, _ =\
             self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
+        
         # Process detections
+        
         results = []
         for i, image in enumerate(molded_images):
             window = [0, 0, image.shape[0], image.shape[1]]
